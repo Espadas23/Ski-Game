@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,23 +11,27 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private KeyCode leftInput, rightInput;
     [SerializeField] private Transform groundPoint;
     [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private float knockBackForce = 300, knockUpForce = 400;
 
     private float speed = 0;
     private Rigidbody rb;
     private Animator animator;
+    private bool isHurt = false;
 
     void Update()
     {
         bool isGrounded = Physics.Linecast(transform.position, groundPoint.position, groundLayer);
-        if (isGrounded)
-        if (Input.GetKey(leftInput) && transform.eulerAngles.y <269)
+        if (isGrounded && !isHurt)
         {
-            transform.Rotate(new Vector3(0, turnSpeed * Time.deltaTime, 0), Space.Self);
-        }
+            if (Input.GetKey(leftInput) && transform.eulerAngles.y < 269)
+            {
+                transform.Rotate(new Vector3(0, turnSpeed * Time.deltaTime, 0), Space.Self);
+            }
 
-        if (Input.GetKey(rightInput) && transform.eulerAngles.y >91)
-        {
-            transform.Rotate(new Vector3(0, -turnSpeed * Time.deltaTime, 0), Space.Self);
+            if (Input.GetKey(rightInput) && transform.eulerAngles.y > 91)
+            {
+                transform.Rotate(new Vector3(0, -turnSpeed * Time.deltaTime, 0), Space.Self);
+            }
         }
     }
 
@@ -36,8 +41,33 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
+    private void OnEnable()
+    {
+        GameEvents.TakeDamage += TakeDamage;
+    }
+
+    private void OnDisable()
+    {
+        GameEvents.TakeDamage -= TakeDamage;
+    }
+
+    private void TakeDamage()
+    {
+        Debug.Log("Player take damage");
+        rb.AddForce(-transform.forward * knockBackForce);
+        rb.AddForce(transform.forward * knockUpForce);
+        isHurt = true;
+        Invoke("Recover", 1.5f);
+    }
+
+    private void Recover()
+    {
+        isHurt = false;
+    }
     private void FixedUpdate()
     {
+        if (isHurt)
+            return;
         float angle = Mathf.Abs(transform.eulerAngles.y - 180);
         acceleration = Remap(0, 90, maxAcceleration, minAcceleration, angle);
         speed += acceleration * Time.fixedDeltaTime;
