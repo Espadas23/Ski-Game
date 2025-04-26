@@ -47,6 +47,8 @@ public class RaceTimer : MonoBehaviour
     private void EndRace()
     {
         raceRunning = false;
+        GameData.instance.racesCompleted++;
         Debug.Log("Race ended!:" + raceTime);
+        Debug.Log("Races Completed: " + GameData.instance.racesCompleted);
     }
 }
