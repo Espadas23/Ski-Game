@@ -5,12 +5,24 @@ public class GameData : MonoBehaviour
 {
 
     public int racesCompleted = 0;
-    public static GameData instance;
+    private static GameData instance;
+
+    public static GameData Instance
+    {
+        get { return instance; }
+    }
 
 
     private void Awake()
     {
-        instance = this;
-        DontDestroyOnLoad(gameObject);
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
     }
 }

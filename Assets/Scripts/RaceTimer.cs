@@ -5,6 +5,7 @@ public class RaceTimer : MonoBehaviour
 {
     private float raceTime = 0;
     private bool raceRunning;
+    [SerializeField] private Leaderboards leaderboard;
 
     private void Update()
     {
@@ -36,19 +37,23 @@ public class RaceTimer : MonoBehaviour
     {
         GameEvents.RaceEnd -= EndRace;
     }
-
+    
+    private void EndRace()
+    {
+        raceRunning = false;
+        GameData.Instance.racesCompleted++;
+        leaderboard.AddResult(raceTime);
+        Debug.Log("Race ended!:" + raceTime);
+        Debug.Log("Races Completed: " + GameData.Instance.racesCompleted);
+    }
+    
     private void StartRace()
     {
         raceTime = 0;
         raceRunning = true;
         Debug.Log("Race started!");
     }
-
-    private void EndRace()
-    {
-        raceRunning = false;
-        GameData.instance.racesCompleted++;
-        Debug.Log("Race ended!:" + raceTime);
-        Debug.Log("Races Completed: " + GameData.instance.racesCompleted);
-    }
+    
+    
+    
 }
