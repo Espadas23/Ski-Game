@@ -4,12 +4,17 @@ using UnityEditor.Overlays;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameOverMenu : MonoBehaviour
 {
     [SerializeField] private GameObject gameOverMenu;
     [SerializeField] private Image overlay;
     [SerializeField] private int nextLevelID;
+    [SerializeField] private GameObject leaderboardPanel;
+    [SerializeField] private GameObject leaderboardEntryPrefab;
+    [SerializeField] private Leaderboards leaderboard;
+
 
 
     void Start()
@@ -33,8 +38,33 @@ public class GameOverMenu : MonoBehaviour
     private void ShowGameOveMenu()
     {
         gameOverMenu.SetActive(true);
+        PopulateLeaderboard();
     }
+    
+    private void PopulateLeaderboard()
+    {
+        foreach (Transform child in leaderboardPanel.transform)
+        {
+            Destroy(child.gameObject);
+        }
 
+        var results = leaderboard.GetResults();
+
+        for (int i = 0; i < results.Count; i++)
+        {
+            //GameObject go = Instantiate(leaderboardEntryPrefab, leaderboardPanel.transform);
+           // TMP_Text text = go.GetComponentInChildren<TMP_Text>();
+            //text.text = $"{i + 1}. {results[i]:F2} sec";
+            GameObject go = Instantiate(leaderboardEntryPrefab, leaderboardPanel.transform);
+            RectTransform rt = go.GetComponent<RectTransform>();
+            rt.anchoredPosition3D = new Vector3(0, 0, 0);
+            rt.localScale = Vector3.one;
+            rt.localRotation = Quaternion.identity;
+            TMP_Text text = go.GetComponentInChildren<TMP_Text>();
+            text.text = $"{i + 1}. {results[i]:F2} sec";
+        }
+    }
+    
     public void Retry()
     {
         Debug.Log("retry");

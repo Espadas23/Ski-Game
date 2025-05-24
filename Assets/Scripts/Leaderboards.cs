@@ -25,4 +25,16 @@ public class Leaderboards : MonoBehaviour
         }
         PlayerPrefs.Save();
     }
+    
+    public List<float> GetResults()
+    {
+        List<float> loaded = new List<float>();
+        for (int i = 0; i < 5; i++)
+        {
+            float time = PlayerPrefs.GetFloat("time" + i, 99999);
+            if (time < 99999)
+                loaded.Add(time);
+        }
+        return loaded;
+    }
 }
